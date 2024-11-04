@@ -1,0 +1,43 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: ./moonga-track-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    environment:
+      # Variables d'environnement pour le backend
+      - MONGO_URI=mongodb://db:27017/moongatrack
+      - JWT_SECRET=TYnL5LLKlZ
+      - PORT=5005
+      - NODE_ENV=development
+      - EMAIL_USER=8831@holbertonstudents.com
+      - EMAIL_PASSWORD=wvef dtie rafd lnay
+    volumes:
+      - ./moonga-track-backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./moonga-track-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Variables d'environnement pour le frontend
+      - REACT_APP_API_URL=http://localhost:5005
+    volumes:
+      - ./moonga-track-frontend:/app
+
+  db:
+    image: mongo:5
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
