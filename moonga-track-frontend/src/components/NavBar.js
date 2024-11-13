@@ -21,10 +21,11 @@ const NavContainer = styled.nav`
     justify-content: center;
     align-items: center;
     padding: 20px 30px;
-    background-color: ${colors.primary};
+    background-color: rgba(126, 89, 252, 0.85);
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    border-bottom: 4px solid ${colors.accent};
+    border-bottom: 6px solid #c49ff1 !important;
     animation: ${sparkle} 1.5s infinite alternate;
+    backdrop-filter: blur(10px);
 `;
 
 const NavControls = styled.div`
@@ -53,8 +54,13 @@ const LogoContainer = styled.div`
     color: ${colors.textLight};
 
     img {
-        height: 60px;  // Augmenté pour une meilleure visibilité
+        height: 60px;
         width: auto;
+        transition: transform 0.3s ease; 
+    }
+
+    &:hover img {
+        transform: scale(1.1);
     }
 
     p {
@@ -99,14 +105,63 @@ const NavBar = () => {
 
     const renderLinks = () => {
         if (isAuthenticated) {
-            return (
+            const baseLinks = (
                 <>
                     <Link to="/">Accueil</Link>
-                    {location.pathname === '/profile' ? (
+                    {location.pathname !== '/profile' && <Link to="/profile">Mon Profil</Link>}
+                    {location.pathname === '/profile' && (
                         <button onClick={handleLogout}>Déconnexion</button>
-                    ) : (
-                        <Link to="/profile">Mon Profil</Link>
                     )}
+                </>
+            );
+
+            // Définir les liens supplémentaires en fonction de la page active
+            let extraLinks;
+            switch (location.pathname) {
+                case '/anime-list':
+                    extraLinks = (
+                        <>
+                            <Link to="/manga-list">Mangaliste</Link>
+                            <Link to="/favorites">Favoris</Link>
+                            <Link to="/suggestions">Suggestions</Link>
+                        </>
+                    );
+                    break;
+                case '/manga-list':
+                    extraLinks = (
+                        <>
+                            <Link to="/anime-list">Animéliste</Link>
+                            <Link to="/favorites">Favoris</Link>
+                            <Link to="/suggestions">Suggestions</Link>
+                        </>
+                    );
+                    break;
+                case '/favorites':
+                    extraLinks = (
+                        <>
+                            <Link to="/anime-list">Animéliste</Link>
+                            <Link to="/manga-list">Mangaliste</Link>
+                            <Link to="/suggestions">Suggestions</Link>
+                        </>
+                    );
+                    break;
+                case '/suggestions':
+                    extraLinks = (
+                        <>
+                            <Link to="/anime-list">Animéliste</Link>
+                            <Link to="/manga-list">Mangaliste</Link>
+                            <Link to="/favorites">Favoris</Link>
+                        </>
+                    );
+                    break;
+                default:
+                    extraLinks = null;
+            }
+
+            return (
+                <>
+                    {baseLinks}
+                    {extraLinks}
                 </>
             );
         } else {

@@ -8,7 +8,7 @@ services:
       - "5005:5005"
     environment:
       # Variables d'environnement pour le backend
-      - MONGO_URI=mongodb://db:27017/moongatrack
+      - MONGO_URI=mongodb+srv://8831:oGDzKWyRoZuUQjYr@moonga.igzkj.mongodb.net/moongatrack
       - JWT_SECRET=TYnL5LLKlZ
       - PORT=5005
       - NODE_ENV=development
@@ -33,7 +33,7 @@ services:
 
   db:
     image: mongo:5
-    container_name: mongo
+    container_name: db
     ports:
       - "27017:27017"
     volumes:

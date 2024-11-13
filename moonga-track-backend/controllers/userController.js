@@ -1,5 +1,4 @@
 const User = require('../models/User');
-const RecommendationModel = require('../models/Recommendation'); // Modèle fictif pour les recommandations
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -38,23 +37,5 @@ exports.login = async (req, res) => {
     res.json({ token });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
-  }
-};
-
-// Endpoint pour obtenir des recommandations en fonction des préférences utilisateur
-exports.getRecommendations = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id);
-    const { genre, theme } = user.preferences; // Récupère les préférences
-
-    // Logique de filtrage des recommandations en fonction des préférences
-    const recommendations = await RecommendationModel.find({
-      genre: genre,
-      theme: theme,
-    });
-
-    res.json(recommendations);
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la récupération des recommandations" });
   }
 };

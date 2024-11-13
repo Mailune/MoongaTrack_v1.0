@@ -1,15 +1,15 @@
 const axios = require('axios');
-
+const Anime = require('../models/Anime');
 const ANILIST_API_URL = 'https://graphql.anilist.co';
 
-// Get anime list from AniList with pagination
+// Get anime list from AniList with pagination and save to MongoDB
 exports.getAnimeList = async (req, res) => {
-  const { page = 1, perPage = 10 } = req.query; // Pagination parameters
+  const { page = 1, perPage = 10 } = req.query;
 
   const query = `
     query ($page: Int, $perPage: Int) {
       Page(page: $page, perPage: $perPage) {
-        media {
+        media(type: ANIME) {
           id
           title {
             romaji
@@ -18,6 +18,7 @@ exports.getAnimeList = async (req, res) => {
           coverImage {
             large
           }
+          genres
         }
       }
     }
@@ -26,16 +27,30 @@ exports.getAnimeList = async (req, res) => {
   try {
     const variables = { page: parseInt(page), perPage: parseInt(perPage) };
     const response = await axios.post(ANILIST_API_URL, { query, variables });
-    res.json(response.data.data.Page.media);
+    const animes = response.data.data.Page.media;
+
+    // Save or update anime records in MongoDB
+    for (const animeData of animes) {
+      await Anime.findOneAndUpdate(
+        { anilistId: animeData.id },
+        {
+          anilistId: animeData.id,
+          title: animeData.title,
+          coverImage: animeData.coverImage.large,
+          genres: animeData.genres,
+        },
+        { upsert: true, new: true }
+      );
+    }
+
+    res.json(animes);
   } catch (error) {
     console.error(`Error fetching data from AniList: ${error.message}`);
     res.status(500).json({ message: 'Error fetching data from AniList', error: error.message });
   }
 };
 
-// controllers/animeController.js
-const { fetchFromAniList, searchMediaQuery } = require('../services/aniListService');
-
+// Search anime from AniList
 exports.searchAnime = async (req, res) => {
   const { search } = req.query;
   try {

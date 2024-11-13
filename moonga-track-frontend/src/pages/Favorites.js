@@ -23,9 +23,30 @@ const FavoriteCard = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 30px; // Augmenter l'espacement entre les cartes
-    box-shadow: 0px 2px 6px rgba(52, 51, 51, 0.5), 0px 0px 12px 4px #7f7d81;
+    margin-bottom: 30px; /* Espacement entre les cartes */
+    position: relative;
+    color: #fff;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à ProfileCard */
+    transition: transform 0.3s;
+
+    &:hover {
+        transform: scale(1.02); /* Zoom au survol */
+    }
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: -1;
+        filter: blur(15px);
+        transform: translate(10px, 10px); /* Déplacement légèrement réduit pour le relief */
+    }
 `;
+
 
 const FavoriteInfo = styled.div`
     display: flex;

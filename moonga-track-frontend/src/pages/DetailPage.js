@@ -21,8 +21,23 @@ const DetailCard = styled.div`
     background-color: #333;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5), 0px 0px 20px 8px #8A2BE2;
+    position: relative;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à AnimeCard */
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: -1;
+        filter: blur(15px);
+        transform: translate(10px, 10px); /* Effet de relief */
+    }
 `;
+
 
 const HeaderSection = styled.div`
     display: flex;

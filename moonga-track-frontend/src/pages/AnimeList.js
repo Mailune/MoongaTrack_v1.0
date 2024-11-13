@@ -33,18 +33,33 @@ const AnimeCard = styled.div`
     border-radius: 8px;
     padding: 15px;
     position: relative;
-    box-shadow: 0 0 10px 4px rgba(238, 48, 81, 0.5);
-    transition: transform 0.3s;
     text-align: center;
-    
+    color: #fff;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à ProfileCard */
+    transition: transform 0.3s;
+
     &:hover {
         transform: scale(1.05);
+    }
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: -1;
+        filter: blur(15px);
+        transform: translate(10px, 10px);
     }
 
     h3, p {
         color: #fff;
     }
 `;
+
 
 const StyledImage = styled.img`
     width: 100%;

@@ -52,3 +52,25 @@ exports.recommendationQuery = `
     }
   }
 `;
+
+// Nouvelle requête pour obtenir des recommandations personnalisées basées sur les genres et thèmes préférés
+exports.personalizedRecommendationQuery = `
+  query ($genres: [String], $themes: [String], $page: Int, $perPage: Int) {
+    Page(page: $page, perPage: $perPage) {
+      media(genre_in: $genres, tag_in: $themes, type: ANIME) {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+        genres
+        tags {
+          name
+        }
+      }
+    }
+  }
+`;

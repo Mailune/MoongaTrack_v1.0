@@ -23,9 +23,24 @@ const ProfileCard = styled.div`
     min-height: 600px;
     text-align: center;
     position: relative;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5),
-                0px 0px 20px 8px ${colors.primary || '#8A2BE2'};
+    color: white;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        bottom: 5px;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: -1;
+        filter: blur(15px);
+        transform: translate(15px, 15px);
+    }
 `;
+
+
 
 const LogoContainer = styled.div`
     display: flex;

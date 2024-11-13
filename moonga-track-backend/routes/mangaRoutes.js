@@ -1,8 +1,8 @@
 const express = require('express');
-const { searchManga } = require('../controllers/mangaController');
+const { getMangaList } = require('../controllers/mangaController');
 const router = express.Router();
 
-// Route de recherche de manga
-router.get('/search', searchManga);
+// Route pour obtenir la liste des mangas et les enregistrer en base de données
+router.get('/mangas', getMangaList);
 
 module.exports = router;
