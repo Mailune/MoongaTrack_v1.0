@@ -64,7 +64,7 @@ Users can save their list of animes and mangas to follow, explore recommendation
 
 ## 📈 ARCHITECTURAL DIAGRAM
 
-![Architecture Diagram](./assets/architecture mg.png) 
+![Architecture Diagram](./assets/architecturemg.png) 
 
 **Description**:
 
@@ -77,7 +77,7 @@ Users can save their list of animes and mangas to follow, explore recommendation
 
 ## 📈 USER STORY DIAGRAM
 
-![user story Diagram](./assets/user story mg.png)
+![user story Diagram](./assets/userstorymg.png)
 
 
 ---
