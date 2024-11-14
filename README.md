@@ -1,7 +1,8 @@
 # MoongaTrack
-
+<p align="center"> 
  MoongaTrack by ROSEREAU Maïlys
 
+<p align="center"> 
 ![logo moongatrack](./assets/avatarprofile.png)
 
 ---
