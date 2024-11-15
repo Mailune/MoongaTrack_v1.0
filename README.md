@@ -3,6 +3,7 @@
 <p align="center"> 
  MoongaTrack by ROSEREAU Maïlys
 <p align="center"> 
+
 ![logo moongatrack](./assets/avatarprofile.png)
 
 ---
@@ -65,7 +66,7 @@ Users can save their list of animes and mangas to follow, explore recommendation
 
 ## 📈 ARCHITECTURAL DIAGRAM
 
-![Architecture Diagram](./assets/architecture mg.png) 
+![Architecture Diagram](./assets/architecturemg.png) 
 
 **Description**:
 
@@ -78,7 +79,7 @@ Users can save their list of animes and mangas to follow, explore recommendation
 
 ## 📈 USER STORY DIAGRAM
 
-![user story Diagram](./assets/user story mg.png)
+![user story Diagram](./assets/userstorymg.png)
 
 
 ---
@@ -175,11 +176,17 @@ Contributions are welcome! To contribute:
 2. Create a new branch for your feature:
    ```bash
    git checkout -b feature-name
-Commit your changes:
+   ```
+3. Commit your changes:
+```bash
 git commit -m "Add feature-name"
-Push to your branch:
+```
+4. Push to your branch:
+```bash
 git push origin feature-name
+```
 Open a Pull Request.
+
 
 ---
 
@@ -197,7 +204,7 @@ Open a Pull Request.
 **MoongaTrack Team**
 
 - Email: [mailysrosereau@yahoo.fr](mailto:mailysrosereau@yahoo.fr)
-- LinkedIn: [www.linkedin.com/in/maïlys-rosereau-7471a5302](https://www.linkedin.com/in/ma%C3%AFlys-rosereau-7471a5302)
+- LinkedIn: [www.linkedin.com/in/maïlys-rosereau-7471a5302](www.linkedin.com/in/maïlys-rosereau-7471a5302)
 - Github: [@Mailune](https://github.com/Mailune)
 
 Copyright (c) 2024 **Maïlys Rosereau**
