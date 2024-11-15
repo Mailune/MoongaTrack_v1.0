@@ -1,7 +1,8 @@
+
 # MoongaTrack
-
+<p align="center"> 
  MoongaTrack by ROSEREAU Maïlys
-
+<p align="center"> 
 ![logo moongatrack](./assets/avatarprofile.png)
 
 ---
@@ -64,7 +65,7 @@ Users can save their list of animes and mangas to follow, explore recommendation
 
 ## 📈 ARCHITECTURAL DIAGRAM
 
-![Architecture Diagram](./assets/architecturemg.png) 
+![Architecture Diagram](./assets/architecture mg.png) 
 
 **Description**:
 
@@ -77,7 +78,7 @@ Users can save their list of animes and mangas to follow, explore recommendation
 
 ## 📈 USER STORY DIAGRAM
 
-![user story Diagram](./assets/userstorymg.png)
+![user story Diagram](./assets/user story mg.png)
 
 
 ---
@@ -167,6 +168,29 @@ Users can save their list of animes and mangas to follow, explore recommendation
 3. **Share Your Comments and Favorite Series**.
 
 ---
+## 🛠️ Contributing
+
+Contributions are welcome! To contribute:
+1. Fork the repository.
+2. Create a new branch for your feature:
+   ```bash
+   git checkout -b feature-name
+Commit your changes:
+git commit -m "Add feature-name"
+Push to your branch:
+git push origin feature-name
+Open a Pull Request.
+
+---
+
+### Related Projects
+
+```markdown
+## Related Projects
+
+- [AniList API](https://anilist.co)
+- [MAL API (MyAnimeList)](https://myanimelist.net)
+- [Other Anime Trackers](https://www.anime-planet.com)
 
 ## 📬 CONTACT
 
