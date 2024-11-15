@@ -35,31 +35,13 @@ const AnimeCard = styled.div`
     position: relative;
     text-align: center;
     color: #fff;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à ProfileCard */
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
 
     &:hover {
         transform: scale(1.05);
     }
-
-    &:after {
-        content: '';
-        position: absolute;
-        top: 5px;
-        left: 5px;
-        right: 5px;
-        bottom: 5px;
-        background: rgba(0, 0, 0, 0.2);
-        z-index: -1;
-        filter: blur(15px);
-        transform: translate(10px, 10px);
-    }
-
-    h3, p {
-        color: #fff;
-    }
 `;
-
 
 const StyledImage = styled.img`
     width: 100%;
@@ -67,15 +49,6 @@ const StyledImage = styled.img`
     object-fit: contain;
     cursor: pointer;
     border-radius: 5px;
-`;
-
-const SavedCard = styled.div`
-    background-color: #444;
-    color: #fff;
-    padding: 10px;
-    border-radius: 8px;
-    margin-top: 8px;
-    font-size: 12px;
 `;
 
 const ActionButton = styled.button`
@@ -106,49 +79,39 @@ const SelectField = styled.select`
     color: black;
 `;
 
+/**
+ * AnimeList Component.
+ * Displays a list of saved animes with options to update or delete them.
+ *
+ * @returns {JSX.Element} The anime list component.
+ */
 const AnimeList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const savedAnime = useSelector((state) => state.library.savedAnime);
 
     const [animeDetails, setAnimeDetails] = useState(
-        savedAnime.map(anime => ({
+        savedAnime.map((anime) => ({
             ...anime,
             status: anime.status || 'À regarder',
             season: anime.season || '',
             episode: anime.episode || '',
             comments: anime.comments || '',
-            savedCards: []
         }))
     );
 
     const handleDelete = (id) => {
         dispatch(removeAnime(id));
-        setAnimeDetails(animeDetails.filter(anime => anime.id !== id));
+        setAnimeDetails(animeDetails.filter((anime) => anime.id !== id));
     };
 
     const handleSave = (id) => {
-        const updatedAnime = animeDetails.find(anime => anime.id === id);
+        const updatedAnime = animeDetails.find((anime) => anime.id === id);
         dispatch(updateAnime(updatedAnime));
-        setAnimeDetails(animeDetails.map(anime =>
-            anime.id === id
-                ? {
-                    ...anime,
-                    savedCards: [
-                        {
-                            status: anime.status,
-                            season: anime.season,
-                            episode: anime.episode,
-                            comments: anime.comments,
-                        }
-                    ]
-                }
-                : anime
-        ));
     };
 
     const handleChange = (id, field, value) => {
-        setAnimeDetails(animeDetails.map(anime =>
+        setAnimeDetails(animeDetails.map((anime) =>
             anime.id === id ? { ...anime, [field]: value } : anime
         ));
     };
@@ -173,8 +136,6 @@ const AnimeList = () => {
                             alt={anime.title.romaji || anime.title}
                             onClick={() => handleImageClick(anime)}
                         />
-                        <p><strong>Auteur:</strong> {anime.author || 'Inconnu'}</p>
-                        <p><strong>Résumé:</strong> {anime.description?.substring(0, 100) || 'Non disponible'}...</p>
                         <div>
                             <label>Status: </label>
                             <SelectField
@@ -213,14 +174,6 @@ const AnimeList = () => {
                             <ActionButton onClick={() => handleSave(anime.id)}>Sauvegarder</ActionButton>
                             <ActionButton delete onClick={() => handleDelete(anime.id)}>Supprimer</ActionButton>
                         </div>
-                        {anime.savedCards.map((card, index) => (
-                            <SavedCard key={index}>
-                                <p><strong>Status:</strong> {card.status}</p>
-                                <p><strong>Saison:</strong> {card.season}</p>
-                                <p><strong>Épisode:</strong> {card.episode}</p>
-                                <p><strong>Commentaires:</strong> {card.comments}</p>
-                            </SavedCard>
-                        ))}
                     </AnimeCard>
                 ))}
             </CardGrid>

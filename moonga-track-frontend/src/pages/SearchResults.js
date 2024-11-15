@@ -110,7 +110,7 @@ const SearchResults = () => {
 
     const [initialResults, setInitialResults] = useState([]);
     const [filteredResults, setFilteredResults] = useState([]);
-    const [filters, setFilters] = useState({ genre: '', year: '', type: '' }); // Ajout du filtre `type`
+    const [filters, setFilters] = useState({ genre: '', year: '', type: '' });
 
     const genres = [
         'Action', 'Adventure', 'Comedy', 'Drama', 'Fantasy', 'Horror', 'Mystery', 

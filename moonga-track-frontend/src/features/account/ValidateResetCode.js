@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import colors from '../utils/colors';
+import colors from '../../utils/colors';
 
+// Styled components
 const Container = styled.div`
     background-color: ${colors.background};
     display: flex;
@@ -65,13 +66,13 @@ const SuccessMessage = styled.p`
     margin-top: 10px;
 `;
 
-const ResetPassword = () => {
-    const [email, setEmail] = useState(''); // Initialisation de l'état pour l'email
+const ValidateResetCode = () => {
+    const [email, setEmail] = useState('');
     const [resetCode, setResetCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState('');
-    const [error, setError] = useState(''); // Initialisation de l'état pour les erreurs
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -103,7 +104,7 @@ const ResetPassword = () => {
     return (
         <Container>
             <Form onSubmit={handleSubmit}>
-                <Title>Réinitialiser le mot de passe</Title>
+                <Title>Réinitialisation du mot de passe</Title>
                 <Input
                     type="email"
                     placeholder="Email"
@@ -140,4 +141,4 @@ const ResetPassword = () => {
     );
 };
 
-export default ResetPassword;
+export default ValidateResetCode;

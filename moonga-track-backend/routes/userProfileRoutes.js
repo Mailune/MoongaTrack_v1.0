@@ -12,16 +12,22 @@ const { requireAuth } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Routes pour le profil utilisateur
+/**
+ * User Profile Routes
+ */
 router.get('/profile', requireAuth, getUserProfile);
 router.put('/profile', requireAuth, updateUserProfile);
 
-// Routes pour la liste de suivi
+/**
+ * Watchlist Routes
+ */
 router.post('/watchlist', requireAuth, addAnimeToWatchlist);
 router.get('/watchlist', requireAuth, getUserWatchlist);
 router.delete('/watchlist', requireAuth, removeAnimeFromWatchlist);
 
-// Routes pour les favoris
+/**
+ * Favorites Routes
+ */
 router.post('/favorites', requireAuth, addAnimeToFavorites);
 router.delete('/favorites', requireAuth, removeAnimeFromFavorites);
 

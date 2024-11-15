@@ -3,8 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled, { keyframes } from 'styled-components';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import colors from '../utils/colors';
-import { logout } from '../redux/actions/authActions';
+import colors from '../../utils/colors';
+import { logout } from '../../redux/actions/authActions';
 
 const sparkle = keyframes`
     0%, 100% {
@@ -92,17 +92,30 @@ const NavLinks = styled.div`
     }
 `;
 
+/**
+ * NavBar Component.
+ * Displays a navigation bar with links and controls.
+ *
+ * @returns {JSX.Element} The navigation bar component.
+ */
 const NavBar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
+    /**
+     * Handles the logout functionality.
+     */
     const handleLogout = () => {
         dispatch(logout());
         navigate('/');
     };
 
+    /**
+     * Renders the appropriate navigation links based on authentication status and active route.
+     * @returns {JSX.Element[]} The navigation links.
+     */
     const renderLinks = () => {
         if (isAuthenticated) {
             const baseLinks = (
@@ -115,7 +128,6 @@ const NavBar = () => {
                 </>
             );
 
-            // Définir les liens supplémentaires en fonction de la page active
             let extraLinks;
             switch (location.pathname) {
                 case '/anime-list':

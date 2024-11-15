@@ -2,7 +2,9 @@ const express = require('express');
 const { searchContent } = require('../controllers/searchController');
 const router = express.Router();
 
-// Route pour la recherche de contenu
+/**
+ * Route to search for anime or manga content from AniList API
+ */
 router.get('/', searchContent);
 
 module.exports = router;

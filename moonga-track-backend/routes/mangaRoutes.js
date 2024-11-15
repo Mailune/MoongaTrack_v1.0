@@ -2,7 +2,9 @@ const express = require('express');
 const { getMangaList } = require('../controllers/mangaController');
 const router = express.Router();
 
-// Route pour obtenir la liste des mangas et les enregistrer en base de données
-router.get('/mangas', getMangaList);
+/**
+ * Route to fetch the manga list from AniList API and save to the database
+ */
+router.get('/', getMangaList);
 
 module.exports = router;

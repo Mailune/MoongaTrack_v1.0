@@ -22,7 +22,7 @@ const DetailCard = styled.div`
     padding: 20px;
     border-radius: 15px;
     position: relative;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à AnimeCard */
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
 
     &:after {
         content: '';
@@ -34,10 +34,9 @@ const DetailCard = styled.div`
         background: rgba(0, 0, 0, 0.2);
         z-index: -1;
         filter: blur(15px);
-        transform: translate(10px, 10px); /* Effet de relief */
+        transform: translate(10px, 10px);
     }
 `;
-
 
 const HeaderSection = styled.div`
     display: flex;
@@ -120,6 +119,12 @@ const StyledIcon = styled.div`
     }
 `;
 
+/**
+ * DetailPage Component.
+ * Displays detailed information about an anime or manga, allowing saving, removal, and adding to favorites.
+ *
+ * @returns {JSX.Element} The detail page component.
+ */
 const DetailPage = () => {
     const location = useLocation();
     const dispatch = useDispatch();

@@ -1,34 +1,40 @@
 const nodemailer = require('nodemailer');
 
-// Configurer le transporteur avec les identifiants de votre service d'e-mail
+/**
+ * Create a Nodemailer transporter using environment variables for credentials
+ */
 const transporter = nodemailer.createTransport({
-    service: 'gmail',  // ou un autre fournisseur de services de messagerie
+    service: 'gmail', // Replace with your desired email service
     auth: {
-        user: process.env.EMAIL_USER,      // renseignez votre adresse e-mail dans les variables d'environnement
-        pass: process.env.EMAIL_PASSWORD       // renseignez votre mot de passe de messagerie dans les variables d'environnement
-    }
+        user: process.env.EMAIL_USER, // Sender's email from environment variables
+        pass: process.env.EMAIL_PASSWORD, // Email password or API key
+    },
 });
 
-// Fonction pour envoyer un e-mail de réinitialisation de mot de passe
+/**
+ * Send a reset password email to the user
+ * @param {string} toEmail - Recipient's email address
+ * @param {string} resetCode - The reset code to include in the email
+ */
 const sendResetPasswordEmail = async (toEmail, resetCode) => {
     const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: toEmail,
-        subject: 'Votre code de réinitialisation de mot de passe',
+        from: process.env.EMAIL_USER, // Sender's email address
+        to: toEmail, // Recipient's email address
+        subject: 'Password Reset Code',
         html: `
-            <h2>Code de réinitialisation de mot de passe</h2>
-            <p>Utilisez ce code pour réinitialiser votre mot de passe :</p>
+            <h2>Password Reset Code</h2>
+            <p>Use this code to reset your password:</p>
             <h3>${resetCode}</h3>
-            <p>Ce code expirera dans 15 minutes.</p>
+            <p>This code will expire in 15 minutes.</p>
         `,
     };
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`E-mail de réinitialisation envoyé à ${toEmail}`);
+        console.log(`Reset password email sent to ${toEmail}`);
     } catch (error) {
-        console.error('Erreur lors de l\'envoi de l\'e-mail de réinitialisation:', error);
-        throw new Error('Échec de l\'envoi de l\'e-mail de réinitialisation');
+        console.error('Error sending reset password email:', error);
+        throw new Error('Failed to send reset password email.');
     }
 };
 

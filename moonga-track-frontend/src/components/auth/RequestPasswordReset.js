@@ -65,6 +65,12 @@ const SuccessMessage = styled.p`
     margin-top: 10px;
 `;
 
+/**
+ * RequestPasswordReset Component.
+ * Allows users to request a password reset by submitting their email.
+ *
+ * @returns {JSX.Element} The password reset request form.
+ */
 const RequestPasswordReset = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
@@ -75,14 +81,19 @@ const RequestPasswordReset = () => {
         e.preventDefault();
         setMessage('');
         setError('');
-    
+
         try {
             const response = await axios.post('http://localhost:5005/api/auth/reset-password-request', { email });
             setMessage(response.data.message);
-            // Redirige l'utilisateur vers la page de validation du code de réinitialisation
+
+            // Redirect the user to the reset code validation page
             setTimeout(() => navigate('/validate-reset-code'), 2000);
         } catch (error) {
-            setError(error.response ? error.response.data.message : 'Erreur lors de la demande de réinitialisation.');
+            setError(
+                error.response
+                    ? error.response.data.message
+                    : 'Erreur lors de la demande de réinitialisation.'
+            );
         }
     };
 

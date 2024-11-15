@@ -4,6 +4,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 import colors from '../utils/colors';
 
+// Styled components
 const SignupPage = styled.div`
     background-color: ${colors.background};
     display: flex;
@@ -45,7 +46,7 @@ const ErrorMessage = styled.p`
 `;
 
 const PasswordStrength = styled.p`
-    color: ${({ strength }) => 
+    color: ${({ strength }) =>
         strength === 'fort' ? 'green' : strength === 'moyen' ? 'orange' : 'red'};
     font-size: 14px;
 `;
@@ -65,6 +66,16 @@ const Button = styled.button`
     }
 `;
 
+// Utility functions
+const evaluatePasswordStrength = (password) => {
+    const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+    const mediumPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
+
+    if (strongPassword.test(password)) return 'fort';
+    if (mediumPassword.test(password)) return 'moyen';
+    return 'faible';
+};
+
 const SignUpForm = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -77,68 +88,50 @@ const SignUpForm = () => {
     const [generalMessage, setGeneralMessage] = useState('');
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const checkUsernameAvailability = async () => {
-            if (username) {
-                try {
-                    const response = await axios.post('http://localhost:5005/api/auth/check-username', { username });
-                    setUsernameError(response.data.exists ? 'Nom d’utilisateur déjà pris' : '');
-                } catch (error) {
-                    console.error("Erreur de vérification du nom d'utilisateur:", error);
-                }
-            }
-        };
-        checkUsernameAvailability();
-    }, [username]);
-
-    useEffect(() => {
-        const checkEmailAvailability = async () => {
-            if (email) {
-                try {
-                    const response = await axios.post('http://localhost:5005/api/auth/check-email', { email });
-                    setEmailError(response.data.exists ? 'Email déjà utilisé' : '');
-                } catch (error) {
-                    console.error("Erreur de vérification de l'email:", error);
-                }
-            }
-        };
-        checkEmailAvailability();
-    }, [email]);
-
-    const evaluatePasswordStrength = (password) => {
-        const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
-        const mediumPassword = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{6,}$/;
-        
-        if (strongPassword.test(password)) {
-            setPasswordStrength('fort');
-        } else if (mediumPassword.test(password)) {
-            setPasswordStrength('moyen');
-        } else {
-            setPasswordStrength('faible');
+    // Handlers for checking availability
+    const checkAvailability = async (type, value, setError) => {
+        if (!value) return;
+        try {
+            const endpoint = `http://localhost:5005/api/auth/check-${type}`;
+            const response = await axios.post(endpoint, { [type]: value });
+            setError(response.data.exists ? `${type === 'username' ? 'Nom d\u2019utilisateur' : 'Email'} déjà pris` : '');
+        } catch (error) {
+            console.error(`Erreur de vérification de ${type}:`, error);
         }
     };
 
     useEffect(() => {
-        if (confirmPassword) {
-            setPasswordMatchError(password === confirmPassword ? '' : 'Les mots de passe ne correspondent pas');
-        }
+        checkAvailability('username', username, setUsernameError);
+    }, [username]);
+
+    useEffect(() => {
+        checkAvailability('email', email, setEmailError);
+    }, [email]);
+
+    useEffect(() => {
+        setPasswordStrength(evaluatePasswordStrength(password));
+    }, [password]);
+
+    useEffect(() => {
+        setPasswordMatchError(password === confirmPassword ? '' : 'Les mots de passe ne correspondent pas');
     }, [confirmPassword, password]);
 
+    // Form submission handler
     const handleSignup = async (e) => {
         e.preventDefault();
         setGeneralMessage('');
 
         try {
-            const response = await axios.post('http://localhost:5005/api/auth/signup', {
-                username,
-                email,
-                password
-            }, { withCredentials: true });
+            const response = await axios.post(
+                'http://localhost:5005/api/auth/signup',
+                { username, email, password },
+                { withCredentials: true }
+            );
 
             setGeneralMessage(response.data.message);
             setTimeout(() => navigate('/validate'), 1500);
         } catch (error) {
-            setGeneralMessage(error.response ? error.response.data.message : 'Erreur lors de l\'inscription');
+            setGeneralMessage(error.response?.data?.message || 'Erreur lors de l\u2019inscription');
         }
     };
 
@@ -146,7 +139,7 @@ const SignUpForm = () => {
         <SignupPage>
             <SignupFormContainer onSubmit={handleSignup}>
                 <Title>Créer un compte</Title>
-                
+
                 <Input
                     type="text"
                     placeholder="Nom d'utilisateur"
@@ -167,10 +160,7 @@ const SignUpForm = () => {
                     type="password"
                     placeholder="Mot de passe"
                     value={password}
-                    onChange={(e) => {
-                        setPassword(e.target.value);
-                        evaluatePasswordStrength(e.target.value);
-                    }}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
                 {password && (
                     <PasswordStrength strength={passwordStrength}>

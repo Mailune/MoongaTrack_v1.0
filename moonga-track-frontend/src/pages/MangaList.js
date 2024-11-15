@@ -35,7 +35,7 @@ const MangaCard = styled.div`
     position: relative;
     text-align: center;
     color: #fff;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à ProfileCard */
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
 
     &:hover {
@@ -52,7 +52,7 @@ const MangaCard = styled.div`
         background: rgba(0, 0, 0, 0.2);
         z-index: -1;
         filter: blur(15px);
-        transform: translate(10px, 10px); /* Déplacement légèrement réduit pour les cartes plus petites */
+        transform: translate(10px, 10px);
     }
 
     h3, p {
@@ -105,53 +105,61 @@ const SelectField = styled.select`
     color: black;
 `;
 
+/**
+ * MangaList Component.
+ * Displays a list of saved manga with options to update or delete them.
+ *
+ * @returns {JSX.Element} The manga list component.
+ */
 const MangaList = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const savedManga = useSelector((state) => state.library.savedManga);
 
     const [mangaDetails, setMangaDetails] = useState(
-        savedManga.map(manga => ({
+        savedManga.map((manga) => ({
             ...manga,
             status: manga.status || 'À lire',
             volume: manga.volume || '',
             page: manga.page || '',
             comments: manga.comments || '',
-            savedCards: []
         }))
     );
 
+    /**
+     * Handles deleting a manga from the list.
+     * @param {number} id - The ID of the manga to remove.
+     */
     const handleDelete = (id) => {
         dispatch(removeManga(id));
-        setMangaDetails(mangaDetails.filter(manga => manga.id !== id));
+        setMangaDetails(mangaDetails.filter((manga) => manga.id !== id));
     };
 
+    /**
+     * Handles saving updates to a manga.
+     * @param {number} id - The ID of the manga to update.
+     */
     const handleSave = (id) => {
-        const updatedManga = mangaDetails.find(manga => manga.id === id);
+        const updatedManga = mangaDetails.find((manga) => manga.id === id);
         dispatch(updateManga(updatedManga));
-        setMangaDetails(mangaDetails.map(manga =>
-            manga.id === id
-                ? {
-                    ...manga,
-                    savedCards: [
-                        {
-                            status: manga.status,
-                            volume: manga.volume,
-                            page: manga.page,
-                            comments: manga.comments,
-                        }
-                    ]
-                }
-                : manga
-        ));
     };
 
+    /**
+     * Handles input changes for manga details.
+     * @param {number} id - The ID of the manga being updated.
+     * @param {string} field - The field being updated.
+     * @param {string|number} value - The new value for the field.
+     */
     const handleChange = (id, field, value) => {
-        setMangaDetails(mangaDetails.map(manga =>
+        setMangaDetails(mangaDetails.map((manga) =>
             manga.id === id ? { ...manga, [field]: value } : manga
         ));
     };
 
+    /**
+     * Handles navigating to the detailed page for a manga.
+     * @param {object} manga - The manga object to view in detail.
+     */
     const handleImageClick = (manga) => {
         navigate(`/details/${manga.id}`, { state: { item: manga } });
     };
@@ -212,14 +220,6 @@ const MangaList = () => {
                             <ActionButton onClick={() => handleSave(manga.id)}>Sauvegarder</ActionButton>
                             <ActionButton delete onClick={() => handleDelete(manga.id)}>Supprimer</ActionButton>
                         </div>
-                        {manga.savedCards.map((card, index) => (
-                            <SavedCard key={index}>
-                                <p><strong>Status:</strong> {card.status}</p>
-                                <p><strong>Tome:</strong> {card.volume}</p>
-                                <p><strong>Page:</strong> {card.page}</p>
-                                <p><strong>Commentaires:</strong> {card.comments}</p>
-                            </SavedCard>
-                        ))}
                     </MangaCard>
                 ))}
             </CardGrid>

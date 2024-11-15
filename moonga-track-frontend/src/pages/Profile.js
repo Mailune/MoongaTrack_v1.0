@@ -40,8 +40,6 @@ const ProfileCard = styled.div`
     }
 `;
 
-
-
 const LogoContainer = styled.div`
     display: flex;
     justify-content: center;
@@ -127,16 +125,30 @@ const SearchContainer = styled.div`
     }
 `;
 
+/**
+ * Profile Component.
+ * Displays the user's profile with navigation and a search bar.
+ *
+ * @returns {JSX.Element} The profile page component.
+ */
 const Profile = () => {
     const navigate = useNavigate();
     const user = useSelector((state) => state.auth.user);
 
     const [searchQuery, setSearchQuery] = useState('');
 
+    /**
+     * Handles navigation to a given path.
+     * @param {string} path - The path to navigate to.
+     */
     const handleNavigation = (path) => {
         navigate(path);
     };
 
+    /**
+     * Handles the search form submission.
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     */
     const handleSearch = (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {

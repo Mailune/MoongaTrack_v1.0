@@ -4,40 +4,83 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, 'Le nom d’utilisateur est requis.'],
+    required: [true, 'Username is required.'],
     unique: true,
-    minlength: [3, 'Le nom d’utilisateur doit comporter au moins 3 caractères.'],
+    minlength: [3, 'Username must be at least 3 characters long.'],
   },
   email: {
     type: String,
-    required: [true, 'L’email est requis.'],
+    required: [true, 'Email is required.'],
     unique: true,
-    match: [/.+\@.+\..+/, 'Format d’email invalide.'],
+    match: [/.+\@.+\..+/, 'Invalid email format.'],
   },
   password_hash: {
     type: String,
-    required: [true, 'Le mot de passe est requis.'],
+    required: [true, 'Password is required.'],
   },
-  validationCode: String,
-  isActive: { type: Boolean, default: false },
-  resetCode: { type: String, default: null },
-  resetCodeExpiration: { type: Date, default: null },
-  // liste de suivis
+  validationCode: {
+    type: String,
+    default: null,
+  },
+  isActive: {
+    type: Boolean,
+    default: false,
+  },
+  resetCode: {
+    type: String,
+    default: null,
+  },
+  resetCodeExpiration: {
+    type: Date,
+    default: null,
+  },
   animeList: [
     {
-      animeId: { type: String, required: true },
-      status: { type: String, enum: ['watching', 'completed', 'planned'], default: 'planned' },
-      rating: { type: Number, min: 0, max: 10 },
-      comment: { type: String }
-    }
+      animeId: {
+        type: String,
+        required: true,
+      },
+      status: {
+        type: String,
+        enum: ['watching', 'completed', 'planned'],
+        default: 'planned',
+      },
+      rating: {
+        type: Number,
+        min: 0,
+        max: 10,
+      },
+      comment: {
+        type: String,
+      },
+    },
   ],
-  // favoris
-  favorites: [{ type: String }], // Liste des favoris d'anime/manga
-  // préférences utilisateur
+  favorites: [{
+    type: String,
+  }],
   preferences: {
-    favoriteGenres: [String],
-    favoriteThemes: [String],
+    favoriteGenres: {
+      type: [String],
+      default: [],
+    },
+    favoriteThemes: {
+      type: [String],
+      default: [],
+    },
   },
 }, { timestamps: true });
+
+/**
+ * Pre-save hook to hash passwords before saving
+ */
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password_hash')) return next();
+  try {
+    this.password_hash = await bcrypt.hash(this.password_hash, 10);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = mongoose.model('User', userSchema);

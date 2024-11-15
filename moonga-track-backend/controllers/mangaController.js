@@ -1,8 +1,11 @@
 const axios = require('axios');
 const Manga = require('../models/Manga');
+const { fetchFromAniList, searchMediaQuery } = require('../services/aniListService');
 const ANILIST_API_URL = 'https://graphql.anilist.co';
 
-// Get manga list from AniList and save to MongoDB
+/**
+ * Fetch manga list from AniList API and save to MongoDB
+ */
 exports.getMangaList = async (req, res) => {
   const query = `
     query {
@@ -27,32 +30,41 @@ exports.getMangaList = async (req, res) => {
     const mangas = response.data.data.Page.media;
 
     // Save or update manga records in MongoDB
-    for (const mangaData of mangas) {
-      await Manga.findOneAndUpdate(
-        { anilistId: mangaData.id },
-        {
+    const bulkOperations = mangas.map((mangaData) => ({
+      updateOne: {
+        filter: { anilistId: mangaData.id },
+        update: {
           anilistId: mangaData.id,
           title: mangaData.title,
           coverImage: mangaData.coverImage.large,
           genres: mangaData.genres,
         },
-        { upsert: true, new: true }
-      );
+        upsert: true,
+      },
+    }));
+
+    if (bulkOperations.length > 0) {
+      await Manga.bulkWrite(bulkOperations);
     }
 
-    res.json(mangas);
+    res.status(200).json(mangas);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching data from AniList' });
+    console.error("Error fetching manga data from AniList:", error.message);
+    res.status(500).json({ message: 'Error fetching data from AniList', error: error.message });
   }
 };
 
-// Search manga from AniList
+/**
+ * Search for manga from AniList API
+ */
 exports.searchManga = async (req, res) => {
   const { search } = req.query;
+
   try {
-    const data = await fetchFromAniList(searchMediaQuery, { search, type: "MANGA" });
-    res.json(data);
+    const data = await fetchFromAniList(searchMediaQuery, { search, type: 'MANGA' });
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: 'Erreur lors de la recherche de manga.' });
+    console.error("Error searching for manga:", error.message);
+    res.status(500).json({ error: 'Error occurred while searching for manga' });
   }
 };

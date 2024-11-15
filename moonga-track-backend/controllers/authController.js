@@ -2,194 +2,203 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const UserModel = require('../models/User');
 const { signUpErrors, signInErrors } = require('../utils/errors');
-const sendValidationEmail = require('../utils/emailService');
-const sendResetPasswordEmail = require('../utils/resetPasswordEmailService'); // Pour les emails de réinitialisation
+const { sendValidationEmail, sendResetPasswordEmail } = require('../utils/emailService');
 
-// Générer un JWT avec rôle et expiration
+/**
+ * Generate a JWT token with role and expiration
+ * @param {string} id - User ID
+ * @param {string} role - User role
+ * @param {string} expiresIn - Expiration time (default: '1h')
+ * @returns {string} - Signed JWT token
+ */
 const createToken = (id, role, expiresIn = '1h') => {
-    return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn });
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn });
 };
 
-// Générer un code de validation de 6 chiffres
-const generateValidationCode = () => Math.floor(100000 + Math.random() * 900000).toString();
-
-// Générer un code de réinitialisation de mot de passe de 6 chiffres
-const generateResetCode = () => Math.floor(100000 + Math.random() * 900000).toString();
-
-// Valider la complexité du mot de passe
+/**
+ * Validate password complexity
+ * @param {string} password - Plain text password
+ * @returns {boolean} - True if password meets requirements
+ */
 const validatePassword = (password) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    return regex.test(password);
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return regex.test(password);
 };
 
-// Vérifier la disponibilité du nom d'utilisateur
+/**
+ * Check username availability
+ */
 const checkUsername = async (req, res) => {
-    const { username } = req.body;
-    try {
-        const userExists = await UserModel.findOne({ username });
-        res.json({ exists: !!userExists });
-    } catch (error) {
-        console.error("Erreur lors de la vérification du nom d'utilisateur:", error);
-        res.status(500).json({ message: 'Erreur de vérification' });
-    }
+  const { username } = req.body;
+  try {
+    const userExists = await UserModel.findOne({ username });
+    res.json({ exists: !!userExists });
+  } catch (error) {
+    console.error("Error checking username availability:", error.message);
+    res.status(500).json({ message: 'Error checking username availability' });
+  }
 };
 
-// Vérifier la disponibilité de l'email
+/**
+ * Check email availability
+ */
 const checkEmail = async (req, res) => {
-    const { email } = req.body;
-    try {
-        const emailExists = await UserModel.findOne({ email });
-        res.json({ exists: !!emailExists });
-    } catch (error) {
-        console.error("Erreur lors de la vérification de l'email:", error);
-        res.status(500).json({ message: 'Erreur de vérification' });
-    }
+  const { email } = req.body;
+  try {
+    const emailExists = await UserModel.findOne({ email });
+    res.json({ exists: !!emailExists });
+  } catch (error) {
+    console.error("Error checking email availability:", error.message);
+    res.status(500).json({ message: 'Error checking email availability' });
+  }
 };
 
-// Vérifier la force du mot de passe
-const checkPasswordStrength = (password) => {
-    if (password.length < 8) return 'faible';
-    if (password.length >= 8 && password.length < 12) return 'moyen';
-    if (password.length >= 12) return 'fort';
-};
-
-// Inscription
+/**
+ * User registration
+ */
 const signUp = async (req, res) => {
-    const { username, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-    if (!validatePassword(password)) {
-        return res.status(400).json({
-            errors: { password: 'Le mot de passe doit comporter au moins 8 caractères avec des lettres majuscules, minuscules, chiffres et caractères spéciaux.' }
-        });
-    }
+  if (!validatePassword(password)) {
+    return res.status(400).json({
+      errors: { password: 'Password must be at least 8 characters, including uppercase, lowercase, number, and special character.' },
+    });
+  }
 
-    try {
-        const existingUsername = await UserModel.findOne({ username });
-        if (existingUsername) return res.status(400).json({ errors: { username: 'Ce nom d’utilisateur est déjà pris.' } });
+  try {
+    const existingUsername = await UserModel.findOne({ username });
+    if (existingUsername) return res.status(400).json({ errors: { username: 'Username is already taken.' } });
 
-        const existingEmail = await UserModel.findOne({ email });
-        if (existingEmail) return res.status(400).json({ errors: { email: 'Cet email est déjà utilisé.' } });
+    const existingEmail = await UserModel.findOne({ email });
+    if (existingEmail) return res.status(400).json({ errors: { email: 'Email is already in use.' } });
 
-        const password_hash = await bcrypt.hash(password, 10);
-        const validationCode = generateValidationCode();
+    const password_hash = await bcrypt.hash(password, 10);
+    const validationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-        const newUser = await UserModel.create({ username, email, password_hash, validationCode, role: 'user', isActive: false });
-        sendValidationEmail(email, validationCode);
-        res.status(201).json({ message: 'Un email de validation a été envoyé.' });
-    } catch (error) {
-        console.error("Erreur dans signUp:", error);
-        res.status(500).json({ errors: { general: 'Erreur serveur, veuillez réessayer plus tard.' } });
-    }
+    const newUser = await UserModel.create({ username, email, password_hash, validationCode, role: 'user', isActive: false });
+    sendValidationEmail(email, validationCode);
+
+    res.status(201).json({ message: 'Validation email sent.' });
+  } catch (error) {
+    console.error("Error in signUp:", error.message);
+    res.status(500).json({ errors: { general: 'Server error. Please try again later.' } });
+  }
 };
 
-// Connexion
+/**
+ * User login
+ */
 const signIn = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    try {
-        const user = await UserModel.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ errors: { message: 'Email inconnu' } });
-        }
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(400).json({ errors: { message: 'Unknown email.' } });
 
-        const passwordMatch = await bcrypt.compare(password, user.password_hash);
-        if (!passwordMatch) {
-            return res.status(400).json({ errors: { message: 'Mot de passe incorrect' } });
-        }
+    const passwordMatch = await bcrypt.compare(password, user.password_hash);
+    if (!passwordMatch) return res.status(400).json({ errors: { message: 'Incorrect password.' } });
 
-        const token = createToken(user._id, user.role);
-        res.cookie('jwt', token, { httpOnly: true, secure: false, sameSite: 'None', maxAge: 3600000 });
-        res.status(200).json({ message: 'Connexion réussie', user });
-    } catch (error) {
-        console.error("Erreur dans signIn:", error);
-        res.status(500).json({ message: 'Erreur serveur' });
-    }
+    const token = createToken(user._id, user.role);
+    res.cookie('jwt', token, { httpOnly: true, secure: false, sameSite: 'None', maxAge: 3600000 });
+    res.status(200).json({ message: 'Login successful', user });
+  } catch (error) {
+    console.error("Error in signIn:", error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-// Vérification de l'utilisateur
+/**
+ * Verify user registration
+ */
 const verifyUser = async (req, res) => {
-    const { email, validationCode } = req.body;
+  const { email, validationCode } = req.body;
 
-    try {
-        const user = await UserModel.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'Utilisateur non trouvé' });
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'User not found.' });
 
-        if (user.validationCode === validationCode) {
-            user.isActive = true;
-            user.validationCode = null;
-            await user.save();
+    if (user.validationCode === validationCode) {
+      user.isActive = true;
+      user.validationCode = null;
+      await user.save();
 
-            const token = createToken(user._id, user.role);
-            res.cookie('jwt', token, { httpOnly: true, secure: false, sameSite: 'None', maxAge: 3600000 });
-            res.status(200).json({ message: 'Inscription validée avec succès.', token });
-        } else {
-            res.status(400).json({ message: 'Code de validation incorrect' });
-        }
-    } catch (error) {
-        console.error("Erreur dans verifyUser:", error);
-        res.status(500).json({ message: 'Erreur serveur' });
+      const token = createToken(user._id, user.role);
+      res.cookie('jwt', token, { httpOnly: true, secure: false, sameSite: 'None', maxAge: 3600000 });
+      res.status(200).json({ message: 'Registration successfully validated.', token });
+    } else {
+      res.status(400).json({ message: 'Invalid validation code.' });
     }
+  } catch (error) {
+    console.error("Error in verifyUser:", error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-// Demande de réinitialisation du mot de passe
+/**
+ * Reset password request
+ */
 const resetPasswordRequest = async (req, res) => {
-    const { email } = req.body;
-    try {
-        const user = await UserModel.findOne({ email });
-        if (!user) return res.status(404).json({ message: "Email non trouvé" });
+  const { email } = req.body;
 
-        const resetCode = generateResetCode();
-        user.resetCode = resetCode;
-        user.resetCodeExpiration = Date.now() + 15 * 60 * 1000; // Code valide pour 15 minutes
-        await user.save();
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(404).json({ message: 'Email not found.' });
 
-        await sendResetPasswordEmail(email, resetCode);
-        res.status(200).json({ message: "Code de réinitialisation envoyé par e-mail." });
-    } catch (error) {
-        console.error("Erreur dans requestPasswordReset:", error);
-        res.status(500).json({ message: "Erreur serveur" });
-    }
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetCode = resetCode;
+    user.resetCodeExpiration = Date.now() + 15 * 60 * 1000; // Valid for 15 minutes
+    await user.save();
+
+    await sendResetPasswordEmail(email, resetCode);
+    res.status(200).json({ message: 'Reset code sent via email.' });
+  } catch (error) {
+    console.error("Error in resetPasswordRequest:", error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-// Réinitialiser le mot de passe
+/**
+ * Reset user password
+ */
 const resetPassword = async (req, res) => {
-    const { email, resetCode, newPassword } = req.body;
+  const { email, resetCode, newPassword } = req.body;
 
-    try {
-        const user = await UserModel.findOne({ email, resetCode });
-        if (!user) return res.status(404).json({ message: "Utilisateur ou code incorrect" });
-        
-        if (user.resetCodeExpiration < Date.now()) {
-            return res.status(400).json({ message: "Code expiré, demandez un nouveau code." });
-        }
+  try {
+    const user = await UserModel.findOne({ email, resetCode });
+    if (!user) return res.status(404).json({ message: 'Invalid email or reset code.' });
 
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        user.password_hash = hashedPassword;
-        user.resetCode = null;
-        user.resetCodeExpiration = null;
-        await user.save();
-
-        res.status(200).json({ message: "Mot de passe réinitialisé avec succès." });
-    } catch (error) {
-        console.error("Erreur dans resetPassword:", error);
-        res.status(500).json({ message: "Erreur serveur" });
+    if (user.resetCodeExpiration < Date.now()) {
+      return res.status(400).json({ message: 'Reset code expired. Request a new one.' });
     }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password_hash = hashedPassword;
+    user.resetCode = null;
+    user.resetCodeExpiration = null;
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error("Error in resetPassword:", error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-// Déconnexion
+/**
+ * User logout
+ */
 const logout = (req, res) => {
-    res.cookie('jwt', '', { maxAge: 1 });
-    res.status(200).json({ message: 'Déconnexion réussie' });
+  res.cookie('jwt', '', { maxAge: 1 });
+  res.status(200).json({ message: 'Logout successful.' });
 };
 
 module.exports = {
-    signUp,
-    signIn,
-    verifyUser,
-    logout,
-    resetPasswordRequest,
-    resetPassword,
-    checkUsername,
-    checkEmail,
-    checkPasswordStrength
+  signUp,
+  signIn,
+  verifyUser,
+  logout,
+  resetPasswordRequest,
+  resetPassword,
+  checkUsername,
+  checkEmail,
 };

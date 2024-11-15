@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import colors from '../utils/colors';
 
+// Styled components
 const PreferencesPage = styled.div`
     background-color: ${colors.background};
     min-height: 100vh;
@@ -54,25 +55,23 @@ const SaveButton = styled.button`
     }
 `;
 
-const UserPreferences = () => (
-    <PreferencesPage>
-        <PreferencesContainer>
-            <Title>Mes Préférences</Title>
-            <CheckboxLabel>
-                <Checkbox type="checkbox" />
-                Aventure
-            </CheckboxLabel>
-            <CheckboxLabel>
-                <Checkbox type="checkbox" />
-                Fantaisie
-            </CheckboxLabel>
-            <CheckboxLabel>
-                <Checkbox type="checkbox" />
-                Romance
-            </CheckboxLabel>
-            <SaveButton>Enregistrer</SaveButton>
-        </PreferencesContainer>
-    </PreferencesPage>
-);
+const UserPreferences = () => {
+    const preferences = ["Aventure", "Fantaisie", "Romance"];
+
+    return (
+        <PreferencesPage>
+            <PreferencesContainer>
+                <Title>Mes Préférences</Title>
+                {preferences.map((preference) => (
+                    <CheckboxLabel key={preference}>
+                        <Checkbox type="checkbox" />
+                        {preference}
+                    </CheckboxLabel>
+                ))}
+                <SaveButton>Enregistrer</SaveButton>
+            </PreferencesContainer>
+        </PreferencesPage>
+    );
+};
 
 export default UserPreferences;

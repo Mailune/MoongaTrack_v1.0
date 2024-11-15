@@ -1,19 +1,22 @@
-
-// Fonction pour gérer les erreurs d'inscription
+/**
+ * Handle errors during user signup
+ * @param {object} error - Error object from Mongoose or other validation steps
+ * @returns {object} - Object containing user-friendly error messages
+ */
 const signUpErrors = (error) => {
-    let errors = { username: '', email: '', password: '' };
+    const errors = { username: '', email: '', password: '' };
 
-    // Erreurs MongoDB pour les champs uniques (code 11000)
+    // Handle MongoDB unique constraint errors (code 11000)
     if (error.code === 11000) {
         if (error.keyValue.email) {
-            errors.email = 'Cet email est déjà utilisé.';
+            errors.email = 'This email is already in use.';
         }
         if (error.keyValue.username) {
-            errors.username = 'Ce nom d’utilisateur est déjà pris.';
+            errors.username = 'This username is already taken.';
         }
     }
 
-    // Erreurs de validation Mongoose
+    // Handle Mongoose validation errors
     if (error.errors) {
         if (error.errors.username) {
             errors.username = error.errors.username.message;
@@ -22,22 +25,26 @@ const signUpErrors = (error) => {
             errors.email = error.errors.email.message;
         }
         if (error.errors.password) {
-            errors.password = 'Le mot de passe doit contenir au moins 8 caractères avec des lettres majuscules, minuscules, chiffres, et caractères spéciaux.';
+            errors.password = 'Password must contain at least 8 characters, including uppercase, lowercase, numbers, and special characters.';
         }
     }
 
     return errors;
 };
 
-// Fonction pour gérer les erreurs de connexion
+/**
+ * Handle errors during user signin
+ * @param {object} error - Error object from validation or business logic
+ * @returns {object} - Object containing user-friendly error messages
+ */
 const signInErrors = (error) => {
-    let errors = { email: '', password: '' };
+    const errors = { email: '', password: '' };
 
-    if (error.message.includes('Email inconnu')) {
-        errors.email = 'Email inconnu.';
+    if (error.message.includes('Unknown email')) {
+        errors.email = 'Unknown email address.';
     }
-    if (error.message.includes('Mot de passe incorrect')) {
-        errors.password = 'Mot de passe incorrect.';
+    if (error.message.includes('Incorrect password')) {
+        errors.password = 'Incorrect password.';
     }
 
     return errors;

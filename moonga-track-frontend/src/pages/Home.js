@@ -38,7 +38,7 @@ const FeaturedSeries = styled.section`
     margin-top: 50px;
     padding: 20px;
     border-radius: 8px;
-    background-color: ${colors.borderGray}; // Légère couleur de fond pour contraster avec le fond principal
+    background-color: ${colors.borderGray};
 
     h2 {
         font-size: 30px;
@@ -97,6 +97,12 @@ const SeriesItem = styled.div`
     }
 `;
 
+/**
+ * Home Component.
+ * Displays the homepage with popular series.
+ *
+ * @returns {JSX.Element} The homepage component.
+ */
 const Home = () => {
     const [popularSeries, setPopularSeries] = useState([]);
 
@@ -122,7 +128,7 @@ const Home = () => {
                 const response = await axios.post('https://graphql.anilist.co', {
                     query: query
                 });
-                
+
                 const series = response.data.data.Page.media;
                 setPopularSeries(series);
             } catch (error) {

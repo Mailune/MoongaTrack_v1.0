@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
-import colors from '../utils/colors';
+import colors from '../../utils/colors';
 import { useNavigate } from 'react-router-dom';
 
 const VerificationPage = styled.div`
@@ -67,13 +67,23 @@ const Message = styled.p`
     margin-top: 10px;
 `;
 
+/**
+ * AccountVerification Component.
+ * Allows users to verify their account by submitting a validation code.
+ *
+ * @returns {JSX.Element} The account verification form.
+ */
 const AccountVerification = () => {
     const [email, setEmail] = useState('');
     const [validationCode, setValidationCode] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-    const navigate = useNavigate(); // Initialiser le hook de navigation
+    const navigate = useNavigate();
 
+    /**
+     * Handles the account verification form submission.
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     */
     const handleVerification = async (e) => {
         e.preventDefault();
 
@@ -86,10 +96,9 @@ const AccountVerification = () => {
             if (response.data.message) {
                 setSuccessMessage("Votre compte a été vérifié avec succès !");
                 setErrorMessage('');
-                 // Rediriger vers la page de connexion après une courte pause
                 setTimeout(() => {
-                navigate('/login');
-                }, 2000); // 2000ms (2 secondes) avant la redirection
+                    navigate('/login');
+                }, 2000);
             } else {
                 setErrorMessage("Code de validation incorrect. Veuillez vérifier.");
                 setSuccessMessage('');

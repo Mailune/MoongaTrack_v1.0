@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import colors from '../utils/colors';
+import colors from '../../utils/colors';
 
 const Container = styled.div`
     background-color: ${colors.background};
@@ -65,7 +65,13 @@ const SuccessMessage = styled.p`
     margin-top: 10px;
 `;
 
-const ValidateResetCode = () => {
+/**
+ * ResetPassword Component.
+ * Provides a form to reset the user's password with validation.
+ *
+ * @returns {JSX.Element} The reset password form.
+ */
+const ResetPassword = () => {
     const [email, setEmail] = useState('');
     const [resetCode, setResetCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -74,6 +80,12 @@ const ValidateResetCode = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    /**
+     * Handles form submission for password reset.
+     * Validates inputs and sends the reset request to the server.
+     *
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setMessage('');
@@ -91,7 +103,7 @@ const ValidateResetCode = () => {
             const response = await axios.post('http://localhost:5005/api/auth/reset-password', {
                 email,
                 resetCode,
-                newPassword
+                newPassword,
             });
             setMessage(response.data.message);
             setTimeout(() => navigate('/login'), 2000);
@@ -103,7 +115,7 @@ const ValidateResetCode = () => {
     return (
         <Container>
             <Form onSubmit={handleSubmit}>
-                <Title>Réinitialisation du mot de passe</Title>
+                <Title>Réinitialiser le mot de passe</Title>
                 <Input
                     type="email"
                     placeholder="Email"
@@ -140,4 +152,4 @@ const ValidateResetCode = () => {
     );
 };
 
-export default ValidateResetCode;
+export default ResetPassword;

@@ -13,7 +13,7 @@ const Container = styled.div`
 
 const Title = styled.h2`
     color: ${colors.primary || '#8A2BE2'};
-    margin-bottom: 40px; // Augmenter l'espacement entre le titre et les cartes
+    margin-bottom: 40px;
 `;
 
 const FavoriteCard = styled.div`
@@ -23,14 +23,14 @@ const FavoriteCard = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 30px; /* Espacement entre les cartes */
+    margin-bottom: 30px;
     position: relative;
     color: #fff;
-    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5); /* Box-shadow similaire à ProfileCard */
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
 
     &:hover {
-        transform: scale(1.02); /* Zoom au survol */
+        transform: scale(1.02);
     }
 
     &:after {
@@ -43,10 +43,9 @@ const FavoriteCard = styled.div`
         background: rgba(0, 0, 0, 0.2);
         z-index: -1;
         filter: blur(15px);
-        transform: translate(10px, 10px); /* Déplacement légèrement réduit pour le relief */
+        transform: translate(10px, 10px);
     }
 `;
-
 
 const FavoriteInfo = styled.div`
     display: flex;
@@ -80,10 +79,20 @@ const RemoveButton = styled.button`
     }
 `;
 
+/**
+ * Favorites Component.
+ * Displays a list of favorite items (anime or manga) with options to remove them.
+ *
+ * @returns {JSX.Element} The favorites page component.
+ */
 const Favorites = () => {
     const dispatch = useDispatch();
     const favorites = useSelector((state) => state.library.favorites);
 
+    /**
+     * Handles the removal of an item from favorites.
+     * @param {number} id - The ID of the item to remove.
+     */
     const handleRemoveFavorite = (id) => {
         dispatch(removeFavorite(id));
     };

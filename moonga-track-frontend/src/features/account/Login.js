@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../redux/actions/authActions';
+import { login } from '../../redux/actions/authActions';
 import { Link, Navigate } from 'react-router-dom';
-import colors from '../utils/colors';
+import colors from '../../utils/colors';
 
 const LoginPage = styled.div`
     background-color: ${colors.background};
@@ -80,18 +80,28 @@ const ForgotPasswordLink = styled(Link)`
     }
 `;
 
+/**
+ * Login Component.
+ * Provides a login form for users to access their accounts.
+ *
+ * @returns {JSX.Element} The login page component.
+ */
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const dispatch = useDispatch();
     const { isAuthenticated, error } = useSelector((state) => state.auth);
 
+    /**
+     * Handles the form submission for user login.
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     */
     const handleLogin = (e) => {
         e.preventDefault();
         dispatch(login({ email, password }));
     };
 
-    // Redirection vers le profil si l'utilisateur est authentifié
+    // Redirect to profile if the user is authenticated
     if (isAuthenticated) {
         return <Navigate to="/profile" />;
     }

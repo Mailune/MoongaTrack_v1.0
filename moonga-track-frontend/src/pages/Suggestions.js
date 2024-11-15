@@ -6,6 +6,7 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import colors from '../utils/colors';
 
+// Styled components
 const Container = styled.div`
     padding: 20px;
     color: ${colors.textLight || '#ffffff'};
@@ -107,6 +108,58 @@ const CarouselButtonRight = styled(CarouselButton)`
     right: 0;
 `;
 
+// Utility functions
+const getPopularGenres = (savedItems) => {
+    const genreCounts = {};
+    savedItems.forEach((item) => {
+        item.genres.forEach((genre) => {
+            genreCounts[genre] = (genreCounts[genre] || 0) + 1;
+        });
+    });
+    return Object.keys(genreCounts)
+        .sort((a, b) => genreCounts[b] - genreCounts[a])
+        .slice(0, 3);
+};
+
+const fetchSuggestions = async (genres, type) => {
+    try {
+        const response = await axios.post('https://graphql.anilist.co', {
+            query: `
+                query ($genre_in: [String], $type: MediaType, $page: Int, $perPage: Int) {
+                    Page(page: $page, perPage: $perPage) {
+                        media(genre_in: $genre_in, type: $type, sort: POPULARITY_DESC) {
+                            id
+                            title {
+                                romaji
+                            }
+                            coverImage {
+                                large
+                            }
+                            genres
+                            description
+                            type
+                            averageScore
+                            popularity
+                            season
+                            format
+                        }
+                    }
+                }
+            `,
+            variables: {
+                genre_in: genres,
+                type: type,
+                page: 1,
+                perPage: 10,
+            },
+        });
+        return response.data.data.Page.media;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des suggestions:', error);
+        return [];
+    }
+};
+
 const Suggestions = () => {
     const savedAnime = useSelector((state) => state.library.savedAnime);
     const savedManga = useSelector((state) => state.library.savedManga);
@@ -116,55 +169,6 @@ const Suggestions = () => {
     const animeCarouselRef = useRef();
     const mangaCarouselRef = useRef();
     const navigate = useNavigate();
-
-    const getPopularGenres = (savedItems) => {
-        const genreCounts = {};
-        savedItems.forEach((item) => {
-            item.genres.forEach((genre) => {
-                genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-            });
-        });
-        return Object.keys(genreCounts).sort((a, b) => genreCounts[b] - genreCounts[a]).slice(0, 3);
-    };
-
-    const fetchSuggestions = async (genres, type) => {
-        try {
-            const response = await axios.post('https://graphql.anilist.co', {
-                query: `
-                    query ($genre_in: [String], $type: MediaType, $page: Int, $perPage: Int) {
-                        Page(page: $page, perPage: $perPage) {
-                            media(genre_in: $genre_in, type: $type, sort: POPULARITY_DESC) {
-                                id
-                                title {
-                                    romaji
-                                }
-                                coverImage {
-                                    large
-                                }
-                                genres
-                                description
-                                type
-                                averageScore
-                                popularity
-                                season
-                                format
-                            }
-                        }
-                    }
-                `,
-                variables: {
-                    genre_in: genres,
-                    type: type,
-                    page: 1,
-                    perPage: 10
-                },
-            });
-            return response.data.data.Page.media;
-        } catch (error) {
-            console.error('Erreur lors de la récupération des suggestions:', error);
-            return [];
-        }
-    };
 
     useEffect(() => {
         const fetchRecommendations = async () => {
@@ -187,12 +191,12 @@ const Suggestions = () => {
     const scrollCarousel = (carouselRef, direction) => {
         carouselRef.current.scrollBy({
             left: direction === 'left' ? -300 : 300,
-            behavior: 'smooth'
+            behavior: 'smooth',
         });
     };
 
     const handleCardClick = (item) => {
-        navigate(`/details/${item.id}`, { state: { item } }); // Passe `item` dans `state`
+        navigate(`/details/${item.id}`, { state: { item } });
     };
 
     return (
@@ -205,14 +209,22 @@ const Suggestions = () => {
                     <FaChevronLeft />
                 </CarouselButtonLeft>
                 <SuggestionsCarousel ref={animeCarouselRef}>
-                    {animeSuggestions.length > 0 ? animeSuggestions.map((anime) => (
-                        <SuggestionCard key={anime.id} onClick={() => handleCardClick(anime)}>
-                            <img src={anime.coverImage.large} alt={anime.title.romaji} />
-                            <h3>{anime.title.romaji}</h3>
-                            <p>{anime.genres.join(', ')}</p>
-                            <p>{anime.description ? anime.description.slice(0, 100) + '...' : 'Pas de description'}</p>
-                        </SuggestionCard>
-                    )) : <p>Aucune recommandation d'animé disponible</p>}
+                    {animeSuggestions.length > 0 ? (
+                        animeSuggestions.map((anime) => (
+                            <SuggestionCard key={anime.id} onClick={() => handleCardClick(anime)}>
+                                <img src={anime.coverImage.large} alt={anime.title.romaji} />
+                                <h3>{anime.title.romaji}</h3>
+                                <p>{anime.genres.join(', ')}</p>
+                                <p>
+                                    {anime.description
+                                        ? anime.description.slice(0, 100) + '...'
+                                        : 'Pas de description'}
+                                </p>
+                            </SuggestionCard>
+                        ))
+                    ) : (
+                        <p>Aucune recommandation d'animé disponible</p>
+                    )}
                 </SuggestionsCarousel>
                 <CarouselButtonRight onClick={() => scrollCarousel(animeCarouselRef, 'right')}>
                     <FaChevronRight />
@@ -225,14 +237,22 @@ const Suggestions = () => {
                     <FaChevronLeft />
                 </CarouselButtonLeft>
                 <SuggestionsCarousel ref={mangaCarouselRef}>
-                    {mangaSuggestions.length > 0 ? mangaSuggestions.map((manga) => (
-                        <SuggestionCard key={manga.id} onClick={() => handleCardClick(manga)}>
-                            <img src={manga.coverImage.large} alt={manga.title.romaji} />
-                            <h3>{manga.title.romaji}</h3>
-                            <p>{manga.genres.join(', ')}</p>
-                            <p>{manga.description ? manga.description.slice(0, 100) + '...' : 'Pas de description'}</p>
-                        </SuggestionCard>
-                    )) : <p>Aucune recommandation de manga disponible</p>}
+                    {mangaSuggestions.length > 0 ? (
+                        mangaSuggestions.map((manga) => (
+                            <SuggestionCard key={manga.id} onClick={() => handleCardClick(manga)}>
+                                <img src={manga.coverImage.large} alt={manga.title.romaji} />
+                                <h3>{manga.title.romaji}</h3>
+                                <p>{manga.genres.join(', ')}</p>
+                                <p>
+                                    {manga.description
+                                        ? manga.description.slice(0, 100) + '...'
+                                        : 'Pas de description'}
+                                </p>
+                            </SuggestionCard>
+                        ))
+                    ) : (
+                        <p>Aucune recommandation de manga disponible</p>
+                    )}
                 </SuggestionsCarousel>
                 <CarouselButtonRight onClick={() => scrollCarousel(mangaCarouselRef, 'right')}>
                     <FaChevronRight />

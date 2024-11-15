@@ -1,104 +1,151 @@
 const User = require('../models/User');
 
-// Obtenir le profil de l'utilisateur
+/**
+ * Get the profile of the logged-in user
+ */
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
-    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     res.status(200).json({ user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error fetching user profile:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Mettre à jour le profil utilisateur
+/**
+ * Update the profile of the logged-in user
+ */
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { favoriteGenres, favoriteThemes } = req.body.preferences;
-    const user = await User.findByIdAndUpdate(req.user.userId, {
-      preferences: { favoriteGenres, favoriteThemes }
-    }, { new: true });
-    res.status(200).json({ message: 'Profil mis à jour avec succès', user });
+    const { favoriteGenres, favoriteThemes } = req.body.preferences || {};
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { preferences: { favoriteGenres, favoriteThemes } },
+      { new: true, runValidators: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ message: 'Profile updated successfully', user });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error updating user profile:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Ajouter un anime à la liste de suivi
+/**
+ * Add an anime to the user's watchlist
+ */
 exports.addAnimeToWatchlist = async (req, res) => {
   try {
     const { animeId, status, rating, comment } = req.body;
     const user = await User.findById(req.user.userId);
 
-    // Vérifier si l'anime est déjà dans la liste de suivi
-    const animeExists = user.animeList.find(item => item.animeId === animeId);
-    if (animeExists) return res.status(400).json({ error: 'Cet anime est déjà dans la liste de suivi' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    // Ajouter l'anime à la liste de suivi
+    const animeExists = user.animeList.some(item => item.animeId === animeId);
+    if (animeExists) {
+      return res.status(400).json({ message: 'Anime already in watchlist' });
+    }
+
     user.animeList.push({ animeId, status, rating, comment });
     await user.save();
-    res.status(200).json({ message: 'Anime ajouté à la liste de suivi' });
+
+    res.status(200).json({ message: 'Anime added to watchlist', animeList: user.animeList });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error adding anime to watchlist:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Ajouter un anime aux favoris
+/**
+ * Add an anime to the user's favorites
+ */
 exports.addAnimeToFavorites = async (req, res) => {
   try {
     const { animeId } = req.body;
     const user = await User.findById(req.user.userId);
 
-    // Vérifier si l'anime est déjà dans les favoris
-    if (user.favorites.includes(animeId)) {
-      return res.status(400).json({ error: 'Cet anime est déjà dans les favoris' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // Ajouter l'anime aux favoris
+    if (user.favorites.includes(animeId)) {
+      return res.status(400).json({ message: 'Anime already in favorites' });
+    }
+
     user.favorites.push(animeId);
     await user.save();
-    res.status(200).json({ message: 'Anime ajouté aux favoris' });
+
+    res.status(200).json({ message: 'Anime added to favorites', favorites: user.favorites });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error adding anime to favorites:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Obtenir la liste de suivi de l'utilisateur
+/**
+ * Get the user's watchlist
+ */
 exports.getUserWatchlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     res.status(200).json({ watchlist: user.animeList });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error fetching watchlist:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Supprimer un anime de la liste de suivi
+/**
+ * Remove an anime from the user's watchlist
+ */
 exports.removeAnimeFromWatchlist = async (req, res) => {
   try {
     const { animeId } = req.body;
     const user = await User.findById(req.user.userId);
 
-    // Supprimer l'anime de la liste de suivi
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     user.animeList = user.animeList.filter(item => item.animeId !== animeId);
     await user.save();
-    res.status(200).json({ message: 'Anime supprimé de la liste de suivi' });
+
+    res.status(200).json({ message: 'Anime removed from watchlist', animeList: user.animeList });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error removing anime from watchlist:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-// Supprimer un anime des favoris
+/**
+ * Remove an anime from the user's favorites
+ */
 exports.removeAnimeFromFavorites = async (req, res) => {
   try {
     const { animeId } = req.body;
     const user = await User.findById(req.user.userId);
 
-    // Supprimer l'anime des favoris
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     user.favorites = user.favorites.filter(id => id !== animeId);
     await user.save();
-    res.status(200).json({ message: 'Anime supprimé des favoris' });
+
+    res.status(200).json({ message: 'Anime removed from favorites', favorites: user.favorites });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error removing anime from favorites:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };

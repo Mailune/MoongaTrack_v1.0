@@ -10,28 +10,36 @@ const {
     checkEmail
 } = require('../controllers/authController');
 const { checkUser, requireAuth } = require('../middleware/authMiddleware');
+
 const router = express.Router();
 
-// Routes publiques
+/**
+ * Public Authentication Routes
+ */
 router.post('/signup', signUp);
 router.post('/signin', signIn);
 router.post('/verify', verifyUser);
 router.post('/reset-password-request', resetPasswordRequest);
 router.post('/reset-password', resetPassword);
 
-// Vérifications en temps réel pour l'unicité des informations
+/**
+ * Real-time Validation Routes
+ */
 router.post('/check-username', checkUsername);
 router.post('/check-email', checkEmail);
 
-// Middleware pour vérifier le token JWT sur toutes les routes suivantes
+/**
+ * Middleware to Validate JWT for Subsequent Routes
+ */
 router.use(checkUser);
 
-// Route de vérification d'authentification
+/**
+ * Authenticated Routes
+ */
 router.get('/checkAuth', requireAuth, (req, res) => {
     res.status(200).json({ message: 'User is authenticated', user: res.locals.user });
 });
 
-// Route de déconnexion
 router.post('/logout', requireAuth, logout);
 
 module.exports = router;
