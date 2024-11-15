@@ -15,6 +15,7 @@ MoongaTrack is a web application designed for anime and manga enthusiasts. This 
 Users can save their list of animes and mangas to follow, explore recommendation lists, and manage their favorites. MoongaTrack stands out for its integration with the public Anilist API and its secure backend.
 
 You can have my project blog article here : [Medium article by ROSEREAU Maïlys](https://medium.com/@8831_5557/moongatrack-tracking-your-anime-and-manga-journey-4dff33f31bba)
+
 ---
 
 ## 📚 MY RESOURCES
