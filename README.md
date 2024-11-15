@@ -198,13 +198,14 @@ Open a Pull Request.
 - [AniList API](https://anilist.co)
 - [MAL API (MyAnimeList)](https://myanimelist.net)
 - [Other Anime Trackers](https://www.anime-planet.com)
+```
 
 ## 📬 CONTACT
 
 **MoongaTrack Team**
 
-- Email: [mailysrosereau@yahoo.fr](mailto:mailysrosereau@yahoo.fr)
-- LinkedIn: [www.linkedin.com/in/maïlys-rosereau-7471a5302](www.linkedin.com/in/maïlys-rosereau-7471a5302)
-- Github: [@Mailune](https://github.com/Mailune)
+- [LinkedIn](https://www.linkedin.com/in/maïlys-rosereau-7471a5302/)
+- [My github](https://github.com/Mailune)
+- **Mail:** mailysrosereau@yahoo.fr
 
 Copyright (c) 2024 **Maïlys Rosereau**
